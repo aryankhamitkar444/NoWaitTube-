@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        font-family: -apple-system, sans-serif;
+        width: 220px;
+        padding: 14px;
+      }
+      h3 {
+        margin: 0 0 10px;
+        font-size: 15px;
+      }
+      label {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        font-size: 13px;
+      }
+      select {
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>YT Ad Speedrunner</h3>
+    <label>
+      Enabled
+      <input type="checkbox" id="enabled" />
+    </label>
+    <label>
+      Ad speed
+      <select id="speed">
+        <option value="4">4x</option>
+        <option value="8">8x</option>
+        <option value="16">16x (max)</option>
+      </select>
+    </label>
+    <script src="popup.js"></script>
+  </body>
+</html>

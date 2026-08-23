@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Ad Speedrunner",
+  "version": "1.0",
+  "description": "Auto-detects YouTube ads, speeds them to 16x + mutes, auto-clicks Skip, then restores normal speed.",
+  "permissions": ["storage"],
+  "content_scripts": [
+    {
+      "matches": ["*://www.youtube.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  }
+}
