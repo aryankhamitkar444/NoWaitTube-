@@ -17,28 +17,54 @@
     return document.querySelector("video");
   }
 
+  function fireClick(el) {
+    const opts = { bubbles: true, cancelable: true, view: window };
+    el.dispatchEvent(new MouseEvent("mouseover", opts));
+    el.dispatchEvent(new MouseEvent("mousedown", opts));
+    el.dispatchEvent(new MouseEvent("mouseup", opts));
+    el.dispatchEvent(new MouseEvent("click", opts));
+  }
+
   function trySkip() {
     const skipBtn = document.querySelector(
-      ".ytp-ad-skip-button, .ytp-ad-skip-button-modern, .ytp-skip-ad-button, .ytp-ad-skip-button-container button"
+      ".ytp-ad-skip-button, .ytp-ad-skip-button-modern, .ytp-skip-ad-button, .ytp-ad-skip-button-container button, button.ytp-ad-skip-button-slot"
     );
-    if (skipBtn) skipBtn.click();
+    if (
+      skipBtn &&
+      !skipBtn.disabled &&
+      skipBtn.getAttribute("aria-disabled") !== "true"
+    ) {
+      fireClick(skipBtn);
+    }
   }
 
   function applyAdState(isAd) {
     const video = getVideo();
     if (!video || !settings.enabled) return;
 
-    if (isAd && !adActive) {
+    if (isAd) {
       adActive = true;
-      video.playbackRate = settings.speed;
-      video.muted = true;
-    } else if (!isAd && adActive) {
+      // Instantly jump to the end of the ad's own timeline instead of
+      // waiting through it at high speed. Falls back to fast playback
+      // if the ad blocks seeking (duration not finite/seekable yet).
+      if (isFinite(video.duration) && video.duration > 0) {
+        video.currentTime = video.duration;
+        // Nudge YouTube's player logic in case it doesn't react to the
+        // seek alone — some ad formats need an explicit "ended" signal
+        video.dispatchEvent(new Event("ended"));
+      }
+      if (video.playbackRate !== settings.speed) {
+        video.playbackRate = settings.speed;
+      }
+      if (!video.muted) {
+        video.muted = true;
+      }
+      trySkip();
+    } else if (adActive) {
       adActive = false;
       video.playbackRate = 1;
       video.muted = false;
     }
-
-    if (isAd) trySkip();
   }
 
   function checkAdStatus() {
@@ -70,7 +96,7 @@
   bodyObserver.observe(document.body, { childList: true, subtree: true });
 
   // Fallback poll in case class-change events are missed
-  setInterval(checkAdStatus, 400);
+  setInterval(checkAdStatus, 100);
 
   attachObserver();
 })();
