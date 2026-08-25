@@ -54,6 +54,10 @@ popup.html   - The right-click popup HTML
 
 popup.js    - The popup scripts
 
+background.js
+
+rules.js
+
 ```
 
 ## Disclaimer
